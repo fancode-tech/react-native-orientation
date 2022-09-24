@@ -151,11 +151,24 @@ RCT_EXPORT_METHOD(getSpecificOrientation:(RCTResponseSenderBlock)callback)
   callback(@[[NSNull null], orientationStr]);
 }
 
+-(void) fixOrientation:(BOOL)fullScreen
+{
+    if (@available(iOS 16, *)) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            UIWindowScene *windowScene = [[[[UIApplication sharedApplication] connectedScenes]allObjects]firstObject];
+            UIWindowSceneGeometryPreferencesIOS *preferencePortait = [[UIWindowSceneGeometryPreferencesIOS alloc]initWithInterfaceOrientations:UIInterfaceOrientationMaskPortrait];
+            UIWindowSceneGeometryPreferencesIOS *preferenceLandscape = [[UIWindowSceneGeometryPreferencesIOS alloc]initWithInterfaceOrientations:UIInterfaceOrientationMaskLandscape];
+            [windowScene requestGeometryUpdateWithPreferences:fullScreen ? preferenceLandscape : preferencePortait errorHandler:nil];
+        });
+    }
+}
+
 RCT_EXPORT_METHOD(lockToPortrait)
 {
   #if DEBUG
     NSLog(@"Locked to Portrait");
   #endif
+  [self fixOrientation:false];
   [Orientation setOrientation:UIInterfaceOrientationMaskPortrait];
   [[NSOperationQueue mainQueue] addOperationWithBlock:^ {
     [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
@@ -169,6 +182,7 @@ RCT_EXPORT_METHOD(lockToLandscape)
   #if DEBUG
     NSLog(@"Locked to Landscape");
   #endif
+  [self fixOrientation:true];
   UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
   NSString *orientationStr = [self getSpecificOrientationStr:orientation];
   if ([orientationStr isEqualToString:@"LANDSCAPE-LEFT"]) {
@@ -191,6 +205,7 @@ RCT_EXPORT_METHOD(lockToLandscapeLeft)
   #if DEBUG
     NSLog(@"Locked to Landscape Left");
   #endif
+    [self fixOrientation:true];
     [Orientation setOrientation:UIInterfaceOrientationMaskLandscapeLeft];
     [[NSOperationQueue mainQueue] addOperationWithBlock:^ {
         [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
@@ -204,6 +219,7 @@ RCT_EXPORT_METHOD(lockToLandscapeRight)
   #if DEBUG
     NSLog(@"Locked to Landscape Right");
   #endif
+    [self fixOrientation:true];
   [Orientation setOrientation:UIInterfaceOrientationMaskLandscapeRight];
   [[NSOperationQueue mainQueue] addOperationWithBlock:^ {
     // this seems counter intuitive
