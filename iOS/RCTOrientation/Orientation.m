@@ -157,7 +157,7 @@ RCT_EXPORT_METHOD(getSpecificOrientation:(RCTResponseSenderBlock)callback)
         dispatch_async(dispatch_get_main_queue(), ^{
             UIWindowScene *windowScene = [[[[UIApplication sharedApplication] connectedScenes]allObjects]firstObject];
             UIWindowSceneGeometryPreferencesIOS *preferencePortait = [[UIWindowSceneGeometryPreferencesIOS alloc]initWithInterfaceOrientations:UIInterfaceOrientationMaskPortrait];
-            UIWindowSceneGeometryPreferencesIOS *preferenceLandscape = [[UIWindowSceneGeometryPreferencesIOS alloc]initWithInterfaceOrientations:UIInterfaceOrientationMaskLandscapeLeft];
+            UIWindowSceneGeometryPreferencesIOS *preferenceLandscape = [[UIWindowSceneGeometryPreferencesIOS alloc]initWithInterfaceOrientations:UIInterfaceOrientationMaskLandscape];
             [windowScene requestGeometryUpdateWithPreferences:fullScreen ? preferenceLandscape : preferencePortait errorHandler:nil];
         });
     }
